@@ -1,7 +1,7 @@
 {
   "name": "BARTR",
   "short_name": "BARTR",
-  "description": "Keep your cash. Spend your talent.",
+  "description": "Trade skills. Not cash.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",

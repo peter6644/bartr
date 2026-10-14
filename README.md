@@ -1,6 +1,6 @@
 # BARTR
 
-Keep your cash. Spend your talent. A web app for trading services with people nearby, starting in LA County.
+Trade skills. Not cash. A web app for trading services with people nearby, starting in LA County.
 
 **What works:** email sign-up, onboarding (skills, needs, ZIP code), profiles with photo and video uploads, Discover with matches and real distances, follow and save, trade proposals with counter-offers, accept/decline/cancel, per-trade chat with live updates, two-sided completion, double-blind reviews, report and block.
 
