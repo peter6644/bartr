@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Icon, Logo } from '../components/ui';
 
-const COLLAGE: [string, string, string][] = [['Haircut', 'Fade + beard trim', 'g1'], ['Photography', 'Headshot session', 'g2'], ['Meal prep', 'Meal prep', 'g3'], ['Tattoo', 'Tattoo', 'g4']];
+const COLLAGE: [string, string, string][] = [['Haircut', 'Haircut', 'g1'], ['Photography', 'Headshot session', 'g2'], ['Meal prep', 'Meal prep', 'g3'], ['Tattoo', 'Tattoo', 'g4']];
 
 export default function Welcome() {
   return (
