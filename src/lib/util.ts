@@ -91,6 +91,7 @@ export const errText = (e: unknown) => {
   const m = (e as { message?: string })?.message || String(e);
   if (/duplicate key.*handle/i.test(m)) return 'That username is taken. Try another.';
   if (/Invalid login credentials/i.test(m)) return 'That email and password don’t match.';
+  if (/Email not confirmed/i.test(m)) return 'Please confirm your email first. Check your inbox for the link from BARTR.';
   if (/User already registered/i.test(m)) return 'There’s already an account with that email. Sign in instead.';
   if (/Password should be/i.test(m)) return 'Use a password with at least 6 characters.';
   return m.replace(/^.*?ERROR:\s*/, '');

@@ -16,7 +16,7 @@ export default function Auth({ mode }: { mode: 'signin' | 'join' }) {
     e.preventDefault(); setErr(''); setInfo(''); setBusy(true);
     try {
       if (join) {
-        const { data, error } = await sb.auth.signUp({ email: email.trim(), password });
+        const { data, error } = await sb.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: window.location.origin } });
         if (error) throw error;
         if (!data.session) setInfo('Check your email to confirm your account, then come back and sign in.');
       } else {
