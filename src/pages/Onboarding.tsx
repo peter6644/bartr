@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { sb } from '../lib/supabase';
 import { useApp } from '../lib/session';
 import { CATEGORIES, DURATIONS, dur, errText, HOODS, isLAZip, SUGGEST, tidy, uploadMedia, ZIPS } from '../lib/util';
@@ -7,19 +7,25 @@ import { ChipPicker, Icon } from '../components/ui';
 export default function Onboarding() {
   const { session, me, refreshMe, toast } = useApp();
   const uid = session!.user.id;
-  const [step, setStep] = useState(0);
-  const [name, setName] = useState(me?.name || '');
-  const [handle, setHandle] = useState(me?.handle || '');
+  /* progress survives a refresh: saved per account in this browser */
+  const KEY = `bartr-onboarding-${uid}`;
+  const saved = (() => { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; } })();
+  const [step, setStep] = useState<number>(saved.step ?? 0);
+  const [name, setName] = useState<string>(saved.name ?? me?.name ?? '');
+  const [handle, setHandle] = useState<string>(saved.handle ?? me?.handle ?? '');
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [cats, setCats] = useState<string[]>(CATEGORIES);
-  const [cat, setCat] = useState('');
-  const [title, setTitle] = useState('');
-  const [minutes, setMinutes] = useState(60);
-  const [where, setWhere] = useState('');
-  const [wantOpts, setWantOpts] = useState<string[]>(CATEGORIES);
-  const [wants, setWants] = useState<string[]>([]);
-  const [zip, setZip] = useState('');
-  const [hood, setHood] = useState('');
+  const [cats, setCats] = useState<string[]>(saved.cats ?? CATEGORIES);
+  const [cat, setCat] = useState<string>(saved.cat ?? '');
+  const [title, setTitle] = useState<string>(saved.title ?? '');
+  const [minutes, setMinutes] = useState<number>(saved.minutes ?? 60);
+  const [where, setWhere] = useState<string>(saved.where ?? '');
+  const [wantOpts, setWantOpts] = useState<string[]>(saved.wantOpts ?? CATEGORIES);
+  const [wants, setWants] = useState<string[]>(saved.wants ?? []);
+  const [zip, setZip] = useState<string>(saved.zip ?? '');
+  const [hood, setHood] = useState<string>(saved.hood ?? '');
+  useEffect(() => {
+    try { localStorage.setItem(KEY, JSON.stringify({ step, name, handle, cats, cat, title, minutes, where, wantOpts, wants, zip, hood })); } catch { /* storage unavailable */ }
+  }, [KEY, step, name, handle, cats, cat, title, minutes, where, wantOpts, wants, zip, hood]);
   const [zipMsg, setZipMsg] = useState('');
   const [agree, setAgree] = useState(false);
   const [err, setErr] = useState('');
@@ -74,6 +80,7 @@ export default function Onboarding() {
       if (we) throw we;
       const { error: fe } = await sb.from('profiles').update({ onboarded: true, avatar_path }).eq('id', uid);
       if (fe) throw fe;
+      try { localStorage.removeItem(KEY); } catch { /* ignore */ }
       await refreshMe();
       toast('Your shop is open. Welcome to BARTR.');
     } catch (e) { setErr(errText(e)); setBusy(false); }
@@ -82,7 +89,9 @@ export default function Onboarding() {
   const bar = <div className="obbar">{[0, 1, 2, 3].map(n => <span key={n} className={n <= step ? 'on' : ''} />)}</div>;
   const backBtn = step > 0
     ? <button className="back" onClick={() => { setErr(''); setStep(s => s - 1); }}><Icon name="back" size={18} sw={2.4} />Back</button>
-    : <button className="back" onClick={() => sb.auth.signOut()}><Icon name="back" size={18} sw={2.4} />Sign out</button>;
+    : <span style={{ height: 38 }} />;
+  const signOut = <button className="btn ghost" style={{ fontSize: 13, fontWeight: 500, color: 'var(--muted)' }}
+    onClick={() => { try { localStorage.removeItem(KEY); } catch { /* ignore */ } sb.auth.signOut(); }}>Not you? Sign out</button>;
 
   return (
     <div className="app bare">
@@ -148,6 +157,7 @@ export default function Onboarding() {
         <div className="obfoot">
           {step < 3 ? <button className="btn" onClick={next}>Next{step === 2 && wants.length ? ` · ${wants.length} picked` : ''}</button>
             : <button className="btn" onClick={finish} disabled={busy}>{busy ? 'Opening your shop…' : 'Start trading'}</button>}
+          {step === 0 && signOut}
         </div>
       </div>
     </div>
